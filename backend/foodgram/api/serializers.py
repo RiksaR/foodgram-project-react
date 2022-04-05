@@ -137,6 +137,16 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         serializer = RecipeListSerializer(instance)
         return serializer.data
 
+    def add_data_to_recipe(self, recipe, tags_data, ingredients_data):
+        for tag in tags_data:
+            recipe.tags.add(tag)
+        for data in ingredients_data:
+            IngredientInRecipe.objects.create(
+                ingredient=data['id'],
+                recipe=recipe,
+                amount=data['amount'],
+            )
+
     def create(self, validated_data):
         tags_data = validated_data.pop('tags')
         author = validated_data.get('author')
@@ -152,40 +162,19 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             text=text,
             cooking_time=cooking_time,
         )
-        for tag in tags_data:
-            recipe.tags.add(tag)
-        for data in ingredients:
-            IngredientInRecipe.objects.create(
-                ingredient=data['id'],
-                recipe=recipe,
-                amount=data['amount'],
-            )
+        self.add_data_to_recipe(recipe, tags_data, ingredients)
         return recipe
 
     def update(self, instance, validated_data):
         ingredients_data = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
-        instance.image = validated_data.get('image', instance.image)
-        instance.name = validated_data.get('name', instance.name)
-        instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get(
-            'cooking_time',
-            instance.cooking_time,
-        )
-        instance.save()
+        super().update(instance, validated_data)
         ingredients_for_delete = IngredientInRecipe.objects.filter(
                 recipe=instance,
             )
         ingredients_for_delete.delete()
         instance.tags.clear()
-        for tag in tags_data:
-            instance.tags.add(tag)
-        for data in ingredients_data:
-            IngredientInRecipe.objects.create(
-                ingredient=data['id'],
-                recipe=instance,
-                amount=data['amount'],
-            )
+        self.add_data_to_recipe(instance, tags_data, ingredients_data)
         return instance
 
 

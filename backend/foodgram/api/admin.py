@@ -11,17 +11,20 @@ class RecipeIngredientInline(admin.TabularInline):
 
 class RecipeAdmin(admin.ModelAdmin):
     inlines = (RecipeIngredientInline,)
-    list_display = ['name', 'author',]
+    list_display = ['name', 'author']
     list_filter = ('name', 'author', 'tags',)
-    readonly_fields = ('Добавлен_в_избранное',)
+    readonly_fields = ('Added_to_favorites',)
 
-    def Добавлен_в_избранное(self, instance):
+    def Added_to_favorites(self, instance):
         return instance.in_favorites.count()
+
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ['name', 'measurement_unit',]
+    list_display = ['name', 'measurement_unit']
     list_filter = ('name',)
+
+
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(IngredientInRecipe)
 admin.site.register(Tag)

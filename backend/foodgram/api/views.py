@@ -90,7 +90,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     queryset = Recipe.objects.all()
     pagination_class = CustomPagination
-    http_method_names = ('get', 'post', 'put', 'delete',)
+    http_method_names = ('get', 'post', 'put', 'patch', 'delete',)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     permission_classes = (RecipePermission,)
@@ -105,41 +105,30 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeMinifiedSerializer
         return RecipeCreateUpdateSerializer
 
-    @action(methods=['get', 'delete',], detail=True)
-    def favorite(self, request, pk=None):
+    def get_data(self, request, model):
         recipe_id = int(self.kwargs['pk'])
         recipe = get_object_or_404(Recipe, id=recipe_id)
         user = request.user
         if request.method == 'GET':
-            Favorite.objects.create(user=user, recipe=recipe)
+            model.objects.create(user=user, recipe=recipe)
             serializer = self.get_serializer(recipe)
             return Response(serializer.data)
         if request.method == 'DELETE':
-            favorite_recipe = get_object_or_404(
-                Favorite,
+            searchable_object = get_object_or_404(
+                model,
                 user=user,
                 recipe=recipe,
             )
-            favorite_recipe.delete()
+            searchable_object.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(methods=['get', 'delete'], detail=True)
+    def favorite(self, request, pk=None):
+        return self.get_data(request, Favorite)
 
     @action(methods=['get', 'delete',], detail=True)
     def shopping_cart(self, request, pk=None):
-        recipe_id = int(self.kwargs['pk'])
-        recipe = get_object_or_404(Recipe, id=recipe_id)
-        user = request.user
-        if request.method == 'GET':
-            ShoppingCart.objects.create(user=user, recipe=recipe)
-            serializer = self.get_serializer(recipe)
-            return Response(serializer.data)
-        if request.method == 'DELETE':
-            shopping_cart = get_object_or_404(
-                ShoppingCart,
-                user=user,
-                recipe=recipe,
-            )
-            shopping_cart.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        return self.get_data(request, ShoppingCart)
 
     @action(detail=False)
     def download_shopping_cart(self, request):

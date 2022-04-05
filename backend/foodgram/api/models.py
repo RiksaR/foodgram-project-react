@@ -1,8 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from .validators import validate_positive_value
-
 User = get_user_model()
 
 
@@ -19,15 +17,15 @@ class Ingredient(models.Model):
         verbose_name='Единица измерения',
     )
 
+    class Meta:
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
+
     def __str__(self):
         """Возвращает строковое представление модели Ingredient
         """
 
         return '{}, {}'.format(self.name, self.measurement_unit)
-
-    class Meta:
-        verbose_name = 'Ингредиент'
-        verbose_name_plural = 'Ингредиенты'
 
 
 class Tag(models.Model):
@@ -45,20 +43,20 @@ class Tag(models.Model):
         verbose_name='Цвет тэга в HEX',
     )
     slug = models.SlugField(
-        max_length = 200,
+        max_length=200,
         unique=True,
         verbose_name='Уникальный слаг тэга',
     )
+
+    class Meta:
+        verbose_name = 'Тэг'
+        verbose_name_plural = 'Тэги'
 
     def __str__(self):
         """Возвращает строковое представление модели Tag
         """
 
         return f'{self.name}'
-
-    class Meta:
-        verbose_name = 'Тэг'
-        verbose_name_plural = 'Тэги'
 
 
 class Recipe(models.Model):
@@ -94,7 +92,6 @@ class Recipe(models.Model):
         verbose_name='Теги',
     )
     cooking_time = models.PositiveIntegerField(
-        validators=[validate_positive_value],
         verbose_name='Время приготовления в минутах',
     )
     pub_date = models.DateTimeField(
@@ -102,16 +99,16 @@ class Recipe(models.Model):
         auto_now_add=True,
     )
 
+    class Meta:
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
+        ordering = ['-pub_date']
+
     def __str__(self):
         """Возвращает строковое представление модели Recipe
         """
 
         return f'{self.name}'
-
-    class Meta:
-        verbose_name = 'Рецепт'
-        verbose_name_plural = 'Рецепты'
-        ordering = ['-pub_date',]
 
 
 class IngredientInRecipe(models.Model):
@@ -130,19 +127,25 @@ class IngredientInRecipe(models.Model):
         verbose_name='Рецепт',
     )
     amount = models.PositiveIntegerField(
-        validators=[validate_positive_value],
         verbose_name='Количество',
     )
+
+    class Meta:
+        verbose_name = 'Ингредиент в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецептах'
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=['ingredient', 'recipe'],
+                name='unique_name_ingredient_in_recipe',
+            )
+        ]
 
     def __str__(self):
         """Возвращает строковое представление модели IngredientInRecipe
         """
 
         return f'Игредиенты для рецепта "{self.recipe.name}"'
-
-    class Meta:
-        verbose_name = 'Ингредиент в рецепте'
-        verbose_name_plural = 'Ингредиенты в рецептах'
 
 
 class Subscription(models.Model):
@@ -162,22 +165,22 @@ class Subscription(models.Model):
         verbose_name='Пользователь, на которого подписываются',
     )
 
-    def __str__(self):
-        """Возвращает строковое представление модели Subscription
-        """
-
-        return f'Подписки пользователя {self.user.username}'
-
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
 
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'subscriptions',],
+                fields=['user', 'subscriptions'],
                 name='unique_name_subscriptions',
             )
         ]
+
+    def __str__(self):
+        """Возвращает строковое представление модели Subscription
+        """
+
+        return f'Подписки пользователя {self.user.username}'
 
 
 class ShoppingCart(models.Model):
@@ -197,22 +200,22 @@ class ShoppingCart(models.Model):
         verbose_name='Рецепты, добавленные в список покупок',
     )
 
-    def __str__(self):
-        """Возвращает строковое представление модели ShoppingCart
-        """
-
-        return f'Список покупок пользователя {self.user.username}'
-
     class Meta:
         verbose_name = 'Добавление рецепта в список покупок'
         verbose_name_plural = 'Добавление рецептов в список покупок'
 
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'recipe',],
+                fields=['user', 'recipe'],
                 name='unique_name_recipe_in_shopping_cart',
             )
         ]
+
+    def __str__(self):
+        """Возвращает строковое представление модели ShoppingCart
+        """
+
+        return f'Список покупок пользователя {self.user.username}'
 
 
 class Favorite(models.Model):
@@ -232,20 +235,20 @@ class Favorite(models.Model):
         verbose_name='Рецепт, который добавляется в избранное',
     )
 
-    def __str__(self):
-        """Возвращает строковое представление модели Favorite
-        """
-
-        return (f'Рецепты, добавленные в избранное пользователем '
-                f'{self.user.username}')
-
     class Meta:
         verbose_name = 'Добавление рецепта в избранное'
         verbose_name_plural = 'Добавление рецептов в избранное'
 
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'recipe',],
+                fields=['user', 'recipe'],
                 name='unique_name_recipe_in_favorites',
             )
         ]
+
+    def __str__(self):
+        """Возвращает строковое представление модели Favorite
+        """
+
+        return (f'Рецепты, добавленные в избранное пользователем '
+                f'{self.user.username}')
