@@ -13,9 +13,9 @@ class RecipeAdmin(admin.ModelAdmin):
     inlines = (RecipeIngredientInline,)
     list_display = ['name', 'author']
     list_filter = ('name', 'author', 'tags',)
-    readonly_fields = ('Added_to_favorites',)
+    readonly_fields = ('added_to_favorites',)
 
-    def Added_to_favorites(self, instance):
+    def added_to_favorites(self, instance):
         return instance.in_favorites.count()
 
 
