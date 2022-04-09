@@ -20,7 +20,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: yanback/infra_actions:latest
+          tags: yanback/foodgram:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -36,4 +36,4 @@ jobs:
         script: |
           sudo docker pull yanback/foodgram
           sudo docker stop $(sudo docker ps -a -q)
-          sudo docker run --rm -d -p 5000:5000 yanback/infra_actions
+          sudo docker run --rm -d -p 8000:8000 yanback/foodgram
