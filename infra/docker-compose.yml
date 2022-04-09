@@ -10,10 +10,7 @@ services:
       - ../.env
 
   backend:
-    # image: yanback/foodgram
-    build:
-      context: ../backend/foodgram/
-      dockerfile: Dockerfile
+    image: yanback/backend:v2
     restart: always
     volumes:
       - static_value:/app/static/
