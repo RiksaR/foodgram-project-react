@@ -138,4 +138,7 @@ static/
 .images
 /images
 images/
+.media
+/media
+media/
 
