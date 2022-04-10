@@ -58,7 +58,6 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
     measurement_unit = serializers.CharField(
         source='ingredient.measurement_unit'
     )
-    amount = serializers.IntegerField(min_value=1)
 
     class Meta:
         model = IngredientInRecipe
@@ -71,7 +70,7 @@ class IngredientInRecipeCreateUpdateSerializer(serializers.Serializer):
     """
 
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
-    amount = serializers.IntegerField()
+    amount = serializers.IntegerField(min_value=1)
 
     class Meta:
         model = IngredientInRecipe
