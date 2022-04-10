@@ -141,7 +141,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         for tag in tags_data:
             recipe.tags.add(tag)
         for data in ingredients_data:
-            IngredientInRecipe.objects.create(
+            IngredientInRecipe.objects.get_or_create(
                 ingredient=data['id'],
                 recipe=recipe,
                 amount=data['amount'],
