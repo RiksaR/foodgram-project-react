@@ -41,6 +41,10 @@ cобрать образ
 ```python
     docker-compose exec backend python manage.py collectstatic --no -input
 ```
+применить команду для загрузки ингредиентов в базу данных
+```python
+    docker-compose exec backend python manage.py load_data
+```
 Для остановки приложения используйте команду
 ```python
     docker-compose down -v
