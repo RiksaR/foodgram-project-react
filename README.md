@@ -39,7 +39,7 @@ cобрать образ
 ```
 применить команду для сбора статики в папку static/
 ```python
-    docker-compose exec backend python manage.py collectstatic --no -input
+    docker-compose exec backend python manage.py collectstatic --noinput
 ```
 применить команду для загрузки ингредиентов в базу данных
 ```python
